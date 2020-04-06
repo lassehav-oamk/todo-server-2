@@ -8,7 +8,7 @@ describe('Database', function() {
     it('Should open DB connection', async function() {
 
       expect(dbService.getDb()).to.equal(null);
-      await dbService.init().then(() => {
+      await dbService.init('test').then(() => {
         expect(dbService.getDb()).not.to.equal(null);
       });
 
@@ -22,7 +22,6 @@ describe('Database', function() {
       await dbService.close().then(() => {
         expect(dbService.getDb()).to.equal(null);
       })
-
     });
   });
 });

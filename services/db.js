@@ -67,7 +67,11 @@ async function run(query, params) {
             reject(error);
             return;
           }
-          resolve(this.lastID);
+          resolve({
+            changes: this.changes,
+            lastID: this.lastID,
+            sql: this.sql
+           });
         });
   });
 }
@@ -75,8 +79,18 @@ async function run(query, params) {
 
 module.exports = {
   getDb: () => db,
-  init: async () => {
-    return openDb('db.sqlite').
+  init: async (dbName) => {
+    let databaseName = dbName;
+    if(!dbName) // check if the parameter was passed
+    {
+      databaseName = 'db.sqlite';
+    }
+    else
+    {
+      databaseName = 'db.test.sqlite';
+    }
+
+    return openDb(databaseName).
       then(() => createTables());
   },
   close: async () => {

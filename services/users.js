@@ -1,6 +1,6 @@
 const uuidv4 = require('uuid/v4');
 const sqlite3 = require('sqlite3').verbose();
-
+var Validator = require('jsonschema').Validator;
 const dbService = require('./db');
 
 const userSchema = {
@@ -21,11 +21,11 @@ const userSchema = {
   }
 };
 
-async function getUserById(usernameToGet) {
+async function getUserById(userId) {
   return new Promise((resolve, reject) => {
     dbService.getDb().get(
-      `SELECT * FROM users WHERE username = ?`,
-      [usernameToGet],
+      `SELECT * FROM users WHERE id = ?`,
+      [userId],
       function(error, row){
         if(error !== null)
         {
@@ -54,42 +54,25 @@ module.exports = {
     return new Promise((resolve, reject) => {
 
       dbService.run('INSERT INTO users (username, password) VALUES(?, ?)', [user.username, user.password])
-      .then(insertID => {
-        return getUserById(insertID);
+      .then(result => {
+        return getUserById(result.lastID);
       })
       .then(user => resolve(user))
       .catch(error => reject(error));
     });
   },
-  getUserById: getUserById
-
-  /*resetApiKey: (userId) => {
-    const user = users.find(u => u.id == userId);
-    if(user === undefined)
-    {
-      return false
-    }
-
-    user.validApiKey = uuidv4();
-    return user.validApiKey;
+  getUserById: getUserById,
+  deleteById: async (userId) => {
+    return dbService.run('DELETE FROM users WHERE id = ?', [userId]);
   },
-  getApiKey: (userId) => {
-    const user = users.find(u => u.id == userId);
-    if(user === undefined)
-    {
-      return false
-    }
-
-    return user.validApiKey;
+  modify: async (user) => {
+      return dbService.run('UPDATE users SET username = ?, password = ? WHERE id = ?', [user.username, user.password, user.id]);
   },
-  getUserWithApiKey: (apiKey) => users.find(u => u.validApiKey == apiKey),
-  addUser: (username, email, password) => {
-    users.push({
-      id: uuidv4(),
-      username,
-      email,
-      password
-    });
-  }*/
+  validateAgainstSchema: (source) => {
+    const v = new Validator();
+    return v.validate(source, userSchema);
+  }
+
+
 
 }
