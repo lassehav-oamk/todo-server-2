@@ -16,7 +16,7 @@
   "paths": {
     "/users": {
       "post": {
-        "summary": "Modify user",
+        "summary": "Create user",
         "operationId": "post-users",
         "responses": {
           "201": {

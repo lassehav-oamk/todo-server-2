@@ -80,17 +80,7 @@ async function run(query, params) {
 module.exports = {
   getDb: () => db,
   init: async (dbName) => {
-    let databaseName = dbName;
-    if(!dbName) // check if the parameter was passed
-    {
-      databaseName = 'db.sqlite';
-    }
-    else
-    {
-      databaseName = 'db.test.sqlite';
-    }
-
-    return openDb(databaseName).
+    return openDb(dbName).
       then(() => createTables());
   },
   close: async () => {

@@ -4,11 +4,11 @@ const expect = require('chai').expect;
 const assert = require('chai').assert;
 const users = require('../services/users');
 const dbService = require('../services/db')
-
+const userSchema = require('../schemas/userSchema.json');
 
 describe('User Service', function() {
   before(async function() {
-    await dbService.init('test');
+    await dbService.init('db.test.sqlite');
   });
 
   after(async function() {
@@ -27,13 +27,12 @@ describe('User Service', function() {
     it('Should create a new user', async function() {
 
       const date = new Date();
-
       await users.createNew({
         username: "tester" + date.getTime(),
         password: "testerPassword"
       }).then(user => {
 
-        expect(user).to.be.jsonSchema(users.getSchema());
+        expect(user).to.be.jsonSchema(userSchema);
 
       }).catch((error) => {
         console.log(error);

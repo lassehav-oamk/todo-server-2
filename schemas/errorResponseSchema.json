@@ -1,0 +1,10 @@
+{
+  "title": "User created successfully schema",
+  "type": "object",
+  "required": ["reason"],
+  "properties": {
+    "reason": {
+      "type": "string"
+    }
+  }
+}

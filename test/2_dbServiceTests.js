@@ -8,7 +8,7 @@ describe('Database', function() {
     it('Should open DB connection', async function() {
 
       expect(dbService.getDb()).to.equal(null);
-      await dbService.init('test').then(() => {
+      await dbService.init('db.test.sqlite').then(() => {
         expect(dbService.getDb()).not.to.equal(null);
       });
 
