@@ -5,6 +5,7 @@ const dbService = require('./services/db');
 
 const app = express();
 const port = 3000;
+let server = null;
 
 const usersComponent = require('./routes/users');
 const todosComponent = require('./routes/todos');
@@ -30,7 +31,7 @@ app.use((err, req, res, next) => {
 });
 
 dbService.init().then(result => {
-  app.listen(port, () => {
+  server = app.listen(port, () => {
     console.log(`Example API listening on http://localhost:${port}\n`);
   });
 })
@@ -38,4 +39,13 @@ dbService.init().then(result => {
   console.log("DB init error");
   console.log(error);
 })
+
+/* Export a function to close the server for test purposes */
+module.exports = {
+  close: function()
+  {
+    server.close();
+  }
+}
+
 

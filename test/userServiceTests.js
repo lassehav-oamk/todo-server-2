@@ -156,7 +156,6 @@ describe('User Service', function() {
       })
       .then(user => {
         // Verify that username has been modified
-        expect(user).to.be.instanceOf(Array);
         expect(user).to.have.property('username', 'modifiedUsername');
       })
       .catch(error => {

@@ -6,15 +6,17 @@ const assert = require('chai').assert;
 const users = require('../services/users');
 const api = 'http://localhost:3000';
 const dbService = require('../services/db');
+let apiServer = null;
 
 describe('User HTTP Routes', function() {
   before(async function() {
     await dbService.init('test');
-    server = require('../index');
+    apiServer = require('../index');
   });
 
   after(async function() {
     await dbService.close();
+    apiServer.close();
   });
 
   describe('Create new user', function() {
@@ -27,7 +29,7 @@ describe('User HTTP Routes', function() {
           password: "HTTPTester1Password"
         })
         .then(response => {
-          console.log(response);
+          //console.log(response);
 
         })
         .catch(error => {
