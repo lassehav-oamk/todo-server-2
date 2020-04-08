@@ -34,6 +34,10 @@ module.exports = {
 
       // Check if username is in use
       dbService.getDb().all('SELECT * FROM users WHERE username = ?', [user.username], function(error, rows) {
+        if(error != null)
+        {
+          reject(error);
+        }
         if(rows.length > 0) {
           reject('User exists');
         }
@@ -54,6 +58,20 @@ module.exports = {
     return dbService.run('DELETE FROM users WHERE id = ?', [userId]);
   },
   modify: async (user) => {
-      return dbService.run('UPDATE users SET username = ?, password = ? WHERE id = ?', [user.username, user.password, user.id]);
+    return dbService.run('UPDATE users SET username = ?, password = ? WHERE id = ?', [user.username, user.password, user.id]);
+  },
+  getUserByName: async (username) => {
+    return new Promise((resolve, reject) => {
+      dbService.getDb().get('SELECT * FROM users WHERE username = ?', [username], function(error, row) {
+        if(row === undefined || error != null)
+        {
+          reject(undefined);
+        }
+        else
+        {
+          resolve(row);
+        }
+      });
+    });
   }
 }
