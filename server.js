@@ -36,12 +36,10 @@ app.use((err, req, res, next) => {
   {
     next();
   }
-
 });
 
 
-
-/* Export a function to close the server for test purposes */
+/* Export a function to start and close the server for test purposes */
 module.exports = {
   close: function()
   {
@@ -49,10 +47,10 @@ module.exports = {
   },
   start: function(mode)
   {
-    let databaseName = 'db.sqlite';
+    let databaseName = 'db.sqlite'; // default database name
     if(mode == "test")
     {
-      databaseName = 'db.test.sqlite';
+      databaseName = 'db.test.sqlite'; // test database name
     }
     dbService.init(databaseName).then(result => {
       server = app.listen(port, () => {

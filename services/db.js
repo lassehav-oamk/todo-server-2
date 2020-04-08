@@ -5,7 +5,6 @@ let db = null;
 async function openDb(dbName)
 {
   return new Promise((resolve, reject) => {
-
     db = new sqlite3.Database(dbName, function(error) {
       if(error !== null) {
         reject(error);
@@ -60,19 +59,26 @@ async function createTables()
   });
 }
 
+/* Helper function which offers promisified version of the .run
+   function of the sqlite API.
+*/
 async function run(query, params) {
   return new Promise((resolve, reject) => {
-    db.run(query, params, function(error) {
-          if(error !== null) {
-            reject(error);
-            return;
-          }
-          resolve({
-            changes: this.changes,
-            lastID: this.lastID,
-            sql: this.sql
-           });
+    db.run(
+      query,
+      params,
+      function(error) {
+        if(error !== null) {
+          reject(error);
+          return;
+        }
+        resolve({
+          changes: this.changes,
+          lastID: this.lastID,
+          sql: this.sql
         });
+      }
+    );
   });
 }
 
@@ -80,8 +86,7 @@ async function run(query, params) {
 module.exports = {
   getDb: () => db,
   init: async (dbName) => {
-    return openDb(dbName).
-      then(() => createTables());
+    return openDb(dbName).then(() => createTables());
   },
   close: async () => {
     return closeDb();

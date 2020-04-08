@@ -34,8 +34,7 @@ module.exports = {
 
       // Check if username is in use
       dbService.getDb().all('SELECT * FROM users WHERE username = ?', [user.username], function(error, rows) {
-        if(error != null)
-        {
+        if(error != null) {
           reject(error);
         }
         if(rows.length > 0) {
@@ -63,12 +62,10 @@ module.exports = {
   getUserByName: async (username) => {
     return new Promise((resolve, reject) => {
       dbService.getDb().get('SELECT * FROM users WHERE username = ?', [username], function(error, row) {
-        if(row === undefined || error != null)
-        {
+        if(row === undefined || error != null) {
           reject(undefined);
         }
-        else
-        {
+        else {
           resolve(row);
         }
       });
