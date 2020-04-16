@@ -11,6 +11,17 @@ const errorResponseSchema = require('../schemas/errorResponseSchema.json');
 const apiServer = require('../server');
 const jsonwebtoken = require('jsonwebtoken');
 
+function createTestUser()
+{
+ return chai.request(api)
+ .post('/users')
+ .set('Content-Type', 'application/json')
+ .send({
+   username: "HTTPTester1",
+   password: "HTTPTester1Password"
+ });
+}
+
 describe('User HTTP Routes', function() {
   before(async function() {
     apiServer.start('test');
@@ -22,13 +33,7 @@ describe('User HTTP Routes', function() {
 
   describe('Create new user', function() {
     it('Should create a new user successfully', async function() {
-      await chai.request(api)
-        .post('/users')
-        .set('Content-Type', 'application/json')
-        .send({
-          username: "HTTPTester1",
-          password: "HTTPTester1Password"
-        })
+      await createTestUser()
         .then(response => {
           expect(response).to.have.property('status');
           expect(response.status).to.equal(201);
@@ -193,7 +198,6 @@ describe('User HTTP Routes', function() {
   });
 
   describe('Modify user', function() {
-
     let userJwt = null;
     let decodedJwt = null;
 
@@ -212,7 +216,6 @@ describe('User HTTP Routes', function() {
     });
 
     it('Should modify username successfully', async function() {
-
       await chai.request(api)
         .put('/users/' + decodedJwt.payload.user.id)
         .set('Authorization', 'Bearer ' + userJwt)
@@ -236,6 +239,62 @@ describe('User HTTP Routes', function() {
           expect(readResponse.body.id).to.equal(decodedJwt.payload.user.id);
 
           expect(readResponse.body.username).to.equal("HTTPTester1Modified");
+        })
+        .catch(error => {
+          throw error;
+        });
+    });
+
+    it('Should modify password successfully', async function() {
+      await chai.request(api)
+        .put('/users/' + decodedJwt.payload.user.id)
+        .set('Authorization', 'Bearer ' + userJwt)
+        .send({
+          username: "HTTPTester1Modified",
+          password: "HTTPTester1PasswordModified"
+        })
+        .then(modifyResponse => {
+          expect(modifyResponse).to.have.property('status');
+          expect(modifyResponse.status).to.equal(200);
+
+          // try to login with new password
+          return chai.request(api)
+            .get('/users/login')
+            .auth('HTTPTester1Modified', 'HTTPTester1PasswordModified');
+        })
+        .then(newLoginResponse => {
+          expect(newLoginResponse).to.have.property('status');
+          expect(newLoginResponse.status).to.equal(200);
+          expect(newLoginResponse.body).to.have.property('jwt');
+        })
+        .catch(error => {
+          throw error;
+        });
+    });
+
+    it('Should delete a user', async function() {
+      await chai.request(api)
+        .delete('/users/' + decodedJwt.payload.user.id)
+        .set('Authorization', 'Bearer ' + userJwt)
+        .then(deleteResponse => {
+          expect(deleteResponse).to.have.property('status');
+          expect(deleteResponse.status).to.equal(200);
+
+          // try to login again with the deleted user
+          return chai.request(api)
+            .get('/users/login')
+            .auth('HTTPTester1Modified', 'HTTPTester1PasswordModified');
+        })
+        .then(newLoginResponse => {
+          expect(newLoginResponse).to.have.property('status');
+          expect(newLoginResponse.status).to.equal(401);
+
+          // Create the test user back again
+          return createTestUser();
+        })
+        .then(createUserResponse => {
+          expect(createUserResponse).to.have.property('status');
+          expect(createUserResponse.status).to.equal(201);
         })
         .catch(error => {
           throw error;

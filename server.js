@@ -13,16 +13,13 @@ const todosComponent = require('./routes/todos');
 app.use(bodyParser.json());
 app.use(cors());
 
-
-
 app.use('/users', usersComponent);
 //app.use('/todos', todosComponent);
 
 // This is an error handling middleware, the function has four parameters.
 // See https://expressjs.com/en/guide/using-middleware.html#middleware.error-handling
 app.use((err, req, res, next) => {
-  if(err.hasOwnProperty('status') == true)
-  {
+  if(err.hasOwnProperty('status') == true) {
     const date = new Date();
     console.error(date.toUTCString() + ' - ' + err.toString());
     console.error('Path attempted - ' + req.path)
@@ -32,8 +29,7 @@ app.use((err, req, res, next) => {
       reason: err.toString()
     });
   }
-  else
-  {
+  else {
     next();
   }
 });
@@ -48,8 +44,7 @@ module.exports = {
   start: function(mode)
   {
     let databaseName = 'db.sqlite'; // default database name
-    if(mode == "test")
-    {
+    if(mode == "test") {
       databaseName = 'db.test.sqlite'; // test database name
     }
     dbService.init(databaseName).then(result => {

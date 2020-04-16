@@ -85,8 +85,7 @@ describe('User Service', function() {
         return users.deleteById(deletedUserId)
       })
       .then(deleteRespose => {
-        expect(deleteRespose).to.have.property('changes', 1);
-        expect(deleteRespose).to.have.property('lastID', deletedUserId);
+        expect(deleteRespose).to.be.true;
         return users.getAll();
       })
       .then(users => {

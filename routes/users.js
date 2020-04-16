@@ -68,7 +68,6 @@ function validateCreateOrModifyUserRequest(req, res, next)
 }
 
 router.post('', validateCreateOrModifyUserRequest, async (req, res) => {
-
   const hashedPassword = bcrypt.hashSync(req.body.password, 6);
 
   try {
@@ -120,7 +119,7 @@ router.put(
       });
 
       if(result.changes == 0) {
-        res.status(400).json({ reason: "UserId not found"});
+        res.status(400).json({ reason: "UserId not found" });
       }
       else {
         res.status(200).send();
@@ -132,8 +131,7 @@ router.put(
     }
 });
 
-router.get(
-  '/:id',
+router.get('/:id',
   passport.authenticate('jwt', { session: false }),
   async (req, res) => {
     try {
@@ -150,5 +148,26 @@ router.get(
 
   return res.json();
 });
+
+router.delete(
+  '/:id',
+  passport.authenticate('jwt', { session: false }),
+  async (req, res) => {
+    try {
+      const result = await users.deleteById(req.params.id);
+
+      if(result == false) {
+        res.status(404).json({ reason: "UserId not found" });
+      }
+      else {
+        res.status(200);
+      }
+
+    } catch (error) {
+      res.status(400).json({
+        reason: error
+      });
+    }
+})
 
 module.exports = router;

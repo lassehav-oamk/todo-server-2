@@ -54,7 +54,20 @@ module.exports = {
   },
   getUserById: getUserById,
   deleteById: async (userId) => {
-    return dbService.run('DELETE FROM users WHERE id = ?', [userId]);
+    return new Promise(async (resolve, reject) => {
+      try{
+        const result = await dbService.run('DELETE FROM users WHERE id = ?', [userId]);
+        if(result.changes == 1) {
+          resolve(true);
+        }
+        else {
+          reject(false);
+        }
+      }
+      catch {
+        reject(false)
+      }
+    });
   },
   modify: async (user) => {
     return dbService.run('UPDATE users SET username = ?, password = ? WHERE id = ?', [user.username, user.password, user.id]);
