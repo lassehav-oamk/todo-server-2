@@ -99,7 +99,7 @@ describe('User Service', function() {
     });
     it('Should not delete user with non-existing ID', async function() {
       let startingUserCount = null;
-      await users.getAll().then(results => {
+      await users.getAll().then(async results => {
         // Save current user count
         expect(results).to.be.instanceOf(Array);
         startingUserCount = results.length;
@@ -107,20 +107,11 @@ describe('User Service', function() {
         const date = new Date();
         const deletedUserId = date.getTime(); // time in milliseconds for a 'random' int value
         // Try to delete a user
-        return users.deleteById(deletedUserId)
-      })
-      .then(deleteRespose => {
-        // verify that no changes have been made
-        expect(deleteRespose).to.have.property('changes', 0);
-        return users.getAll();
-      })
-      .then(users => {
-        // Verify that user count has not been reduced
-        expect(users).to.be.instanceOf(Array);
-        expect(users).to.have.lengthOf(startingUserCount);
+        const deleteResult = await users.deleteById(deletedUserId);
+        assert.fail("User delete promise should not resolve");
       })
       .catch(error => {
-        assert.fail(error);
+        expect(error).to.be.false;
       });
     });
   });

@@ -1,54 +1,15 @@
 const express = require('express');
 const router = express.Router();
-const users = require('../services/users');
 const bcrypt = require('bcryptjs');
-const passport = require('passport');
-const BasicStrategy = require('passport-http').BasicStrategy;
 const jwt = require('jsonwebtoken');
-const JwtStrategy = require('passport-jwt').Strategy,
-      ExtractJwt = require('passport-jwt').ExtractJwt;
+const users = require('../services/users');
+const passportInstance = require('./passportAuthConfig');
+
 const Validator = require('jsonschema').Validator;
 const userSchema = require('../schemas/userSchema.json');
+const secretJWT = require('../jwtKey.json');
 
-const secretJWTKey = 'mysecret-token-key1243';
 
-passport.use(new BasicStrategy(
-  async function(username, password, done) {
-
-    try {
-      const user = await users.getUserByName(username);
-      if(user == undefined) {
-        // Username not found
-        return done(null, false);
-      }
-
-      /* Verify password match */
-      if(bcrypt.compareSync(password, user.password) == false) {
-        // Password does not match
-        return done(null, false);
-      }
-      return done(null, user);
-    } catch (error) {
-      return done(null, false);
-    }
-
-  }
-));
-
-let jwtOptions = {}
-
-/* Configure the passport-jwt module to expect JWT
-   in headers from Authorization field as Bearer token */
-jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
-
-/* This is the secret signing key.
-   You should NEVER store it in code  */
-jwtOptions.secretOrKey = secretJWTKey;
-
-passport.use(new JwtStrategy(jwtOptions, function(jwt_payload, done) {
-
-  done(null, jwt_payload.user);
-}));
 
 function validateCreateOrModifyUserRequest(req, res, next)
 {
@@ -86,7 +47,7 @@ router.post('', validateCreateOrModifyUserRequest, async (req, res) => {
   }
 });
 
-router.get('/login', passport.authenticate('basic', { session: false }), async (req, res) => {
+router.get('/login', passportInstance.authenticate('basic', { session: false }), async (req, res) => {
 
   const payload = {
     user : {
@@ -101,14 +62,14 @@ router.get('/login', passport.authenticate('basic', { session: false }), async (
   /* Sign the token with payload, key and options.
      Detailed documentation of the signing here:
      https://github.com/auth0/node-jsonwebtoken#readme */
-  const token = jwt.sign(payload, secretJWTKey, options);
+  const token = jwt.sign(payload, secretJWT.key, options);
 
   return res.json({ jwt: token });
 });
 
 router.put(
   '/:id',
-  passport.authenticate('jwt', { session: false }),
+  passportInstance.authenticate('jwt', { session: false }),
   validateCreateOrModifyUserRequest,
   async (req, res) => {
     try {
@@ -132,7 +93,7 @@ router.put(
 });
 
 router.get('/:id',
-  passport.authenticate('jwt', { session: false }),
+  passportInstance.authenticate('jwt', { session: false }),
   async (req, res) => {
     try {
       const user = await users.getUserById(req.params.id);
@@ -151,7 +112,7 @@ router.get('/:id',
 
 router.delete(
   '/:id',
-  passport.authenticate('jwt', { session: false }),
+  passportInstance.authenticate('jwt', { session: false }),
   async (req, res) => {
     try {
       const result = await users.deleteById(req.params.id);
@@ -160,7 +121,7 @@ router.delete(
         res.status(404).json({ reason: "UserId not found" });
       }
       else {
-        res.status(200);
+        res.status(200).send();
       }
 
     } catch (error) {
