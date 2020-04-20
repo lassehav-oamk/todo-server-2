@@ -1,0 +1,19 @@
+{
+  "title": "New Todo",
+  "type": "object",
+  "required": [ "description", "status", "dueDateTime"],
+  "properties": {
+    "description": {
+      "type": "string",
+      "description": "Description of the todo"
+    },
+    "dueDateTime": {
+      "type": "date-time",
+      "description": "When the task is due"
+    },
+    "status": {
+      "type": "string",
+      "description": "Status indicator is the todo open or done"
+    }
+  }
+}

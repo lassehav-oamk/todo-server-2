@@ -14,7 +14,7 @@ app.use(bodyParser.json());
 app.use(cors());
 
 app.use('/users', usersComponent);
-//app.use('/todos', todosComponent);
+app.use('/todos', todosComponent);
 
 // This is an error handling middleware, the function has four parameters.
 // See https://expressjs.com/en/guide/using-middleware.html#middleware.error-handling

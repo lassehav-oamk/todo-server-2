@@ -1,0 +1,41 @@
+{
+  "title": "Array of Todos",
+  "type": "object",
+  "required": ["todos"],
+  "properties": {
+    "todos": {
+      "type": "array",
+      "items": {
+        "items": { "$ref": "#/definitions/todo" }
+      }
+    }
+  },
+  "definitions": {
+    "todo": {
+      "type": "object",
+      "required": [ "id", "description", "status", "dueDateTime", "createdDateTime"],
+      "properties": {
+        "id": {
+          "type": "number",
+          "description": "Unique id of the todo"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the todo"
+        },
+        "dueDateTime": {
+          "type": "date-time",
+          "description": "When the task is due"
+        },
+        "status": {
+          "type": "string",
+          "description": "Status indicator is the todo open or done"
+        },
+        "createdDateTime": {
+          "type": "date-time",
+          "description": "When the task was created"
+        }
+      }
+    }
+  }
+}

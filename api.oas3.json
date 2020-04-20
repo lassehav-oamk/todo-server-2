@@ -377,7 +377,6 @@
               "examples": {
                 "example-1": {
                   "value": {
-                    "id": 5346,
                     "description": "Buy milk",
                     "dueDateTime": "2020-04-03T10:29:02Z",
                     "status": "open"
@@ -547,7 +546,6 @@
           }
         },
         "required": [
-          "id",
           "description",
           "dueDateTime",
           "status"
