@@ -37,5 +37,28 @@ module.exports = {
       }
     */
 
+  },
+  getTodoById: async (todoId, userId) => {
+    return new Promise((resolve, reject) => {
+      dbService.getDb().get('SELECT * FROM todos WHERE id = ? AND user = ?', [todoId, userId], function(error, rows) {
+        error !== null ? reject(error) : null;
+
+        resolve(rows);
+      });
+    });
+  },
+  deleteTodoById: async (todoId, userId) => {
+    return new Promise((resolve, reject) => {
+      dbService.run('DELETE FROM todos WHERE id = ? AND user = ?', [todoId, userId])
+        .then(result => {
+          if(result.changes == 1) {
+            resolve(true);
+          }
+          else {
+            reject(false);
+          }
+        })
+        .catch(error => reject(error));
+    });
   }
 }

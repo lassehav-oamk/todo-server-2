@@ -413,6 +413,9 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "Not found",
           }
         },
         "operationId": "get-todos-id",

@@ -39,6 +39,27 @@ router.get(
     }
 });
 
+router.get(
+  '/:id',
+  passportInstance.authenticate('jwt', { session: false }),
+  async (req, res) => {
+    try {
+      // Enforce that user can only query todos owned by him
+      const theTodo = await todos.getTodoById(req.params.id, req.user.id);
+
+      if(theTodo === undefined) {
+        res.status(404).send();
+      }
+      else {
+        res.status(200).json(theTodo);
+      }
+    } catch (error) {
+      res.status(400).json({
+        reason: error
+      });
+    }
+});
+
 router.post(
   '',
   passportInstance.authenticate('jwt', { session: false }),
@@ -59,6 +80,20 @@ router.post(
       res.status(400).json({
         reason: error
       });
+    }
+});
+
+router.delete(
+  '/:id',
+  passportInstance.authenticate('jwt', { session: false }),
+  async (req, res) => {
+    try {
+      // Enforce that user can only query todos owned by him
+      const result = await todos.deleteTodoById(req.params.id, req.user.id);
+
+      res.status(200).send();
+    } catch (error) {
+      res.status(404).send();
     }
 });
 

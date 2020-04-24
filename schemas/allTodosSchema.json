@@ -24,7 +24,8 @@
           "description": "Description of the todo"
         },
         "dueDateTime": {
-          "type": "date-time",
+          "type": "string",
+          "format": "date-time",
           "description": "When the task is due"
         },
         "status": {
@@ -32,7 +33,8 @@
           "description": "Status indicator is the todo open or done"
         },
         "createdDateTime": {
-          "type": "date-time",
+          "type": "string",
+          "format": "date-time",
           "description": "When the task was created"
         }
       }

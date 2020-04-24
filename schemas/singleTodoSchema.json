@@ -1,8 +1,12 @@
 {
-  "title": "New Todo",
+  "title": "Single todo",
   "type": "object",
-  "required": [ "description", "status", "dueDateTime"],
+  "required": [ "id", "description", "status", "dueDateTime", "createdDateTime"],
   "properties": {
+    "id": {
+      "type": "number",
+      "description": "Unique id of the todo"
+    },
     "description": {
       "type": "string",
       "description": "Description of the todo"
@@ -15,6 +19,11 @@
     "status": {
       "type": "string",
       "description": "Status indicator is the todo open or done"
+    },
+    "createdDateTime": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the task was created"
     }
   }
 }

@@ -9,6 +9,7 @@ const api = 'http://localhost:3000';
 const dbService = require('../services/db');
 const errorResponseSchema = require('../schemas/errorResponseSchema.json');
 const allTodosSchema = require('../schemas/allTodosSchema.json');
+const singleTodoSchema = require('../schemas/singleTodoSchema.json');
 const apiServer = require('../server');
 const jsonwebtoken = require('jsonwebtoken');
 
@@ -39,7 +40,7 @@ describe('Todo HTTP Routes', function() {
         .set('Authorization', 'Bearer ' + userJwt)
         .send({
           "description": "Buy milk",
-          "dueDateTime": "2020-06-10T10:00:00Z",
+          "dueDateTime": "2020-06-10T10:00:00+00:00",
           "status": "open"
         })
         .then(response => {
@@ -50,7 +51,9 @@ describe('Todo HTTP Routes', function() {
           assert.fail(error);
         });
     });
-  })
+  });
+
+  let storedTodos = null;
 
   describe('Get Todos', function() {
     it('Should get this user todos', async function() {
@@ -64,12 +67,79 @@ describe('Todo HTTP Routes', function() {
           expect(response.body.todos).to.have.lengthOf(1);
           expect(response.body.todos[0].description).to.equal("Buy milk");
           expect(response.body.todos[0].status).to.equal("open");
-          expect(response.body.todos[0].dueDateTime).to.equal("2020-06-10T10:00:00Z");
+          expect(response.body.todos[0].dueDateTime).to.equal("2020-06-10T10:00:00+00:00");
+          storedTodos = response.body.todos;
+        })
+        .catch(error => {
+          assert.fail(error);
+        });
+    });
+  });
+
+  describe('Get a single todo', function() {
+    it('should get a todo with valid id', async function() {
+      await chai.request(api)
+        .get('/todos/' + storedTodos[0].id)
+        .set('Authorization', 'Bearer ' + userJwt)
+        .then(response => {
+          expect(response).to.have.property('status');
+          expect(response.status).to.equal(200);
+          expect(response.body).to.be.jsonSchema(singleTodoSchema);
+          expect(response.body.id).to.equal(storedTodos[0].id);
+
         })
         .catch(error => {
           assert.fail(error);
         });
     });
 
+    it('should fail to get a todo with invalid id', async function() {
+      await chai.request(api)
+        .get('/todos/' + 34523402834029527)
+        .set('Authorization', 'Bearer ' + userJwt)
+        .then(response => {
+          expect(response).to.have.property('status');
+          expect(response.status).to.equal(404);
+
+        })
+        .catch(error => {
+          assert.fail(error);
+        });
+    });
   });
+
+  describe('Delete a Todo', function() {
+    it('Should delete a todo', async function() {
+      await chai.request(api)
+        .delete('/todos/' + storedTodos[0].id)
+        .set('Authorization', 'Bearer ' + userJwt)
+        .then(response => {
+          expect(response).to.have.property('status');
+          expect(response.status).to.equal(200);
+          return chai.request(api)
+            .get('/todos/' + storedTodos[0].id)
+            .set('Authorization', 'Bearer ' + userJwt);
+        })
+        .then(checkResponse => {
+          expect(checkResponse).to.have.property('status');
+          expect(checkResponse.status).to.equal(404);
+        })
+        .catch(error => {
+          assert.fail(error);
+        });
+    });
+
+    it('Should fail to delete a non existing todo', async function() {
+      await chai.request(api)
+        .delete('/todos/' + 165713548951324)
+        .set('Authorization', 'Bearer ' + userJwt)
+        .then(response => {
+          expect(response).to.have.property('status');
+          expect(response.status).to.equal(404);
+        })
+        .catch(error => {
+          assert.fail(error);
+        });
+    });
+  })
 });
