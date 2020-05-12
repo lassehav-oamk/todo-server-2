@@ -36,8 +36,8 @@ async function createTables()
     run(
       `CREATE TABLE IF NOT EXISTS "users" (
       "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-      "username"	TEXT NOT NULL,
-      "password"	TEXT NOT NULL
+      "username" TEXT NOT NULL,
+      "password" TEXT NOT NULL
       )`,
       []
     )
@@ -45,9 +45,9 @@ async function createTables()
       run(
         `CREATE TABLE IF NOT EXISTS "todos" (
         "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-        "user"	INTEGER NOT NULL,
+        "user" INTEGER NOT NULL,
         "description"	TEXT NOT NULL,
-        "status"	TEXT NOT NULL,
+        "isDone" INTEGER NOT NULL,
         "dueDateTime"	TEXT NOT NULL,
         "createdDateTime"	INTEGER NOT NULL
         )`,

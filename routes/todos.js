@@ -5,7 +5,7 @@ const Validator = require('jsonschema').Validator;
 const passportInstance = require('./passportAuthConfig');
 const newTodoSchema = require('../schemas/newTodoSchema.json');
 
-function validateNewTodoRequest(req, res, next)
+function validateNewOrEditedTodoRequest(req, res, next)
 {
   try {
     const v = new Validator();
@@ -27,7 +27,7 @@ router.get(
   passportInstance.authenticate('jwt', { session: false }),
   async (req, res) => {
     try {
-      const myTodos = await todos.getTodosByUserId(req.user.id);
+      let myTodos = await todos.getTodosByUserId(req.user.id);
 
       res.status(200).json({
         todos: myTodos
@@ -63,7 +63,7 @@ router.get(
 router.post(
   '',
   passportInstance.authenticate('jwt', { session: false }),
-  validateNewTodoRequest,
+  validateNewOrEditedTodoRequest,
   async (req, res) => {
 
     try {
@@ -73,7 +73,7 @@ router.post(
         description: req.body.description,
         dueDateTime: req.body.dueDateTime,
         createdDateTime: now.toISOString(),
-        status: 'open'
+        isDone: false
       });
       res.status(201).send();
     } catch (error) {
@@ -95,6 +95,22 @@ router.delete(
     } catch (error) {
       res.status(404).send();
     }
+});
+
+router.put(
+  '/:id',
+  passportInstance.authenticate('jwt', { session: false }),
+  validateNewOrEditedTodoRequest,
+  async (req, res) => {
+    try {
+      // Enforce that user can only query todos owned by him
+      const result = await todos.updateTodoById(req.params.id, req.body);
+
+      res.status(200).send();
+    } catch (error) {
+      res.status(404).send();
+    }
+
 });
 
 module.exports = router;

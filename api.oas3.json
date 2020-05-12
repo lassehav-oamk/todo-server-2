@@ -544,8 +544,9 @@
             "format": "date-time",
             "example": "2020-04-03T10:29:02Z"
           },
-          "status": {
-            "type": "string"
+          "isDone": {
+            "type": "boolean",
+            "description": "Is the task done or not"
           }
         },
         "required": [

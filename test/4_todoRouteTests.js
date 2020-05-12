@@ -41,7 +41,7 @@ describe('Todo HTTP Routes', function() {
         .send({
           "description": "Buy milk",
           "dueDateTime": "2020-06-10T10:00:00+00:00",
-          "status": "open"
+          "isDone": false
         })
         .then(response => {
           expect(response).to.have.property('status');
@@ -66,7 +66,7 @@ describe('Todo HTTP Routes', function() {
           expect(response.body).to.be.jsonSchema(allTodosSchema);
           expect(response.body.todos).to.have.lengthOf(1);
           expect(response.body.todos[0].description).to.equal("Buy milk");
-          expect(response.body.todos[0].status).to.equal("open");
+          expect(response.body.todos[0].isDone).to.equal(false);
           expect(response.body.todos[0].dueDateTime).to.equal("2020-06-10T10:00:00+00:00");
           storedTodos = response.body.todos;
         })
@@ -108,6 +108,75 @@ describe('Todo HTTP Routes', function() {
     });
   });
 
+  describe('Toggle todo state', function() {
+    it('Should mark todo done', async function() {
+      await chai.request(api)
+        .put('/todos/' + storedTodos[0].id)
+        .set('Authorization', 'Bearer ' + userJwt)
+        .send({
+          "description": storedTodos[0].description,
+          "dueDateTime": storedTodos[0].dueDateTime,
+          "isDone": true
+        })
+        .then(response => {
+          expect(response).to.have.property('status');
+          expect(response.status).to.equal(200);
+          return chai.request(api)
+            .get('/todos/' + storedTodos[0].id)
+            .set('Authorization', 'Bearer ' + userJwt);
+        })
+        .then(checkResponse => {
+          expect(checkResponse.body).to.have.property('isDone');
+          expect(checkResponse.body.isDone).to.equal(true);
+        })
+        .catch(error => {
+          assert.fail(error);
+        });
+    });
+
+    it('Should fail to edit with missing fields', async function() {
+      await chai.request(api)
+        .put('/todos/' + storedTodos[0].id)
+        .set('Authorization', 'Bearer ' + userJwt)
+        .send({
+          "description": "This description should not be saved"
+        })
+        .then(response => {
+          expect(response).to.have.property('status');
+          expect(response.status).to.equal(400);
+          return chai.request(api)
+            .get('/todos/' + storedTodos[0].id)
+            .set('Authorization', 'Bearer ' + userJwt);
+        })
+        .then(checkResponse => {
+          // Check that description is not changed
+          expect(checkResponse.body).to.have.property('description');
+          expect(checkResponse.body.description).to.equal(storedTodos[0].description);
+        })
+        .catch(error => {
+          assert.fail(error);
+        });
+    });
+
+    it('Should fail with non-existing todo id', async function() {
+      await chai.request(api)
+        .put('/todos/' + 16546513366658)
+        .set('Authorization', 'Bearer ' + userJwt)
+        .send({
+          "description": storedTodos[0].description,
+          "dueDateTime": storedTodos[0].dueDateTime,
+          "isDone": true
+        })
+        .then(response => {
+          expect(response).to.have.property('status');
+          expect(response.status).to.equal(404);
+        })
+        .catch(error => {
+          assert.fail(error);
+        });
+    });
+  });
+
   describe('Delete a Todo', function() {
     it('Should delete a todo', async function() {
       await chai.request(api)
@@ -142,4 +211,6 @@ describe('Todo HTTP Routes', function() {
         });
     });
   })
+
+
 });

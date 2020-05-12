@@ -1,7 +1,7 @@
 {
   "title": "Single todo",
   "type": "object",
-  "required": [ "id", "description", "status", "dueDateTime", "createdDateTime"],
+  "required": [ "id", "description", "isDone", "dueDateTime", "createdDateTime"],
   "properties": {
     "id": {
       "type": "number",
@@ -16,8 +16,8 @@
       "format": "date-time",
       "description": "When the task is due"
     },
-    "status": {
-      "type": "string",
+    "isDone": {
+      "type": "boolean",
       "description": "Status indicator is the todo open or done"
     },
     "createdDateTime": {

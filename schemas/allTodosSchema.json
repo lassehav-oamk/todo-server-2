@@ -28,8 +28,8 @@
           "format": "date-time",
           "description": "When the task is due"
         },
-        "status": {
-          "type": "string",
+        "isDone": {
+          "type": "boolean",
           "description": "Status indicator is the todo open or done"
         },
         "createdDateTime": {
