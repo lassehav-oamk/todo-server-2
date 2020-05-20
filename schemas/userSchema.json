@@ -1,0 +1,17 @@
+{
+  "title": "User schema",
+  "type": "object",
+  "required": ["username", "password"],
+  "optional": ["id"],
+  "properties": {
+    "id": {
+      "type": "number"
+    },
+    "username": {
+      "type": "string"
+    },
+    "password": {
+      "type": "string"
+    }
+  }
+}

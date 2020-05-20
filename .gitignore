@@ -1,3 +1,6 @@
+db.sqlite
+db.test.sqlite
+
 # Logs
 logs
 *.log
